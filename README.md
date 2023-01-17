@@ -54,3 +54,9 @@ These files are:
 
 
 # Step 1: The server
+
+You can now launch your server with the command : 
+
+``` python manage.py runserver ```
+
+If it's all working, you should have "Congratulations!" at http://127.0.0.1:8000/
