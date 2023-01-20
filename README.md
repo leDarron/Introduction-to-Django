@@ -103,3 +103,98 @@ execute the function :
     - Create model Question
     - Create model Choice
 ```
+
+# Step 4: create the polls and the choices with the python shell
+
+first step : write `python manage.py shell`
+
+after that, with the shell, find a way to create the polls and the choices. You can do the number of polls that you want and at least 2 choices per polls. At the end, it's should look like that :
+
+```
+>>> Question.objects.all()
+<QuerySet [<Question: Question object (1)>]>
+
+>>> q.choice_set.count()
+3 (if you have 3 choices)
+```
+
+# Step 5: Creating an admin user
+
+```
+python manage.py createsuperuser
+
+Username: admin
+Email address: admin@example.com
+Password: **********
+Password (again): *********
+Superuser created successfully.
+```
+
+Now, start your server and go to "/admin". you should have that :
+
+![image](https://user-images.githubusercontent.com/72023512/213755617-b1240fd2-6c70-4dd6-9bb0-ef7718f4b7c3.png)
+
+to make the poll modifiable by the admin, add that to polls/admin.py :
+
+```
+from django.contrib import admin
+
+from .models import Question
+
+admin.site.register(Question)
+
+```
+
+Now you should have the "POLLS" option available :
+
+![image](https://user-images.githubusercontent.com/72023512/213755869-ee1b9990-e949-48be-931a-1a5166b9ea5b.png)
+
+# Step 6: write more views
+
+write veiws for the detail, the results and the vote. You should uptdate the file polls/views.py and polls/urls.py
+
+After that, you can add a simple front in a new directory **polls/templates/polls/index.html** that should look like that :
+
+```
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+```
+
+# Step 7: Write a 404 error
+
+Raise a 404 error if the polls is not existing. It should be in your polls/views.py file.
+
+# Step 8: write your front for the detail and result
+
+In your polls/views.py : add a function to vote. It should look like that :
+
+```
+
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        return render(request, 'polls/detail.html', {
+            'question': question,
+            'error_message': "You didn't select a choice.",
+        })
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+
+```
+
+Now create a .html for the detail and result.
+
+# Conclustion
+
+If everything is working, you now can vote for everyting. If you want to continue, you can ameliorate the vote system or the front.
